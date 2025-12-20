@@ -1,9 +1,6 @@
-import { AppSidebar } from "@/components/app-sidebar";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-	return (
-		<div className="h-svh">
-			<AppSidebar />
-		</div>
-	);
+	redirect("/chat");
+	return null;
 }

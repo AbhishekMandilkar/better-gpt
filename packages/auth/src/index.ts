@@ -1,4 +1,4 @@
-import { db } from "@better-gpt/db";
+import db from "@better-gpt/db";
 import * as schema from "@better-gpt/db/schema/auth";
 import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";

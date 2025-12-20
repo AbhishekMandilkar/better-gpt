@@ -1,5 +1,6 @@
 "use client";
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import Link from "next/link";
 
 import {
 	Sidebar,
@@ -11,7 +12,9 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarMenuSkeleton,
 } from "@/components/ui/sidebar";
+import { useChats } from "@/hooks/use-chats";
 import { ModeToggle } from "./mode-toggle";
 
 // Menu items.
@@ -44,24 +47,32 @@ const items = [
 ];
 
 export function AppSidebar() {
+	const { data: chats, isPending } = useChats();
+	console.log(chats, isPending);
 	return (
 		<Sidebar>
 			<SidebarContent>
 				<SidebarGroup>
-					<SidebarGroupLabel>Application</SidebarGroupLabel>
+					<SidebarGroupLabel>Chats</SidebarGroupLabel>
 					<SidebarGroupContent>
-						<SidebarMenu>
-							{items.map((item) => (
-								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild={false}>
-										<a href={item.url} className="flex items-center gap-2">
-											<item.icon />
-											<span>{item.title}</span>
-										</a>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu>
+						{isPending ? (
+							<SidebarMenuSkeleton />
+						) : (
+							<SidebarMenu>
+								{chats?.map((chat) => (
+									<SidebarMenuItem key={chat.id}>
+										<SidebarMenuButton asChild={false}>
+											<Link
+												href={`/chat/${chat.id}`}
+												className="flex items-center gap-2"
+											>
+												<span>{chat.title}</span>
+											</Link>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								))}
+							</SidebarMenu>
+						)}
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
