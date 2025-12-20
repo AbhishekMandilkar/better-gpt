@@ -1,41 +1,41 @@
-import { nextCookies } from 'better-auth/next-js';
 import { db } from "@better-gpt/db";
 import * as schema from "@better-gpt/db/schema/auth";
-import { polar, checkout, portal } from "@polar-sh/better-auth";
+import { checkout, polar, portal } from "@polar-sh/better-auth";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { nextCookies } from "better-auth/next-js";
 
 import { polarClient } from "./lib/payments";
 
 export const auth = betterAuth({
-  database: drizzleAdapter(db, {
-    provider: "pg",
+	database: drizzleAdapter(db, {
+		provider: "pg",
 
-    schema: schema,
-  }),
-  trustedOrigins: [process.env.CORS_ORIGIN || ""],
-  emailAndPassword: {
-    enabled: true,
-  },
-  plugins: [
-    polar({
-      client: polarClient,
-      createCustomerOnSignUp: true,
-      enableCustomerPortal: true,
-      use: [
-        checkout({
-          products: [
-            {
-              productId: "your-product-id",
-              slug: "pro",
-            },
-          ],
-          successUrl: process.env.POLAR_SUCCESS_URL,
-          authenticatedUsersOnly: true,
-        }),
-        portal(),
-      ],
-    }),
-    nextCookies()
-  ],
+		schema: schema,
+	}),
+	trustedOrigins: [process.env.CORS_ORIGIN || ""],
+	emailAndPassword: {
+		enabled: true,
+	},
+	plugins: [
+		polar({
+			client: polarClient,
+			createCustomerOnSignUp: true,
+			enableCustomerPortal: true,
+			use: [
+				checkout({
+					products: [
+						{
+							productId: "your-product-id",
+							slug: "pro",
+						},
+					],
+					successUrl: process.env.POLAR_SUCCESS_URL,
+					authenticatedUsersOnly: true,
+				}),
+				portal(),
+			],
+		}),
+		nextCookies(),
+	],
 });
