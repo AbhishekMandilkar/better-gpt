@@ -1,9 +1,9 @@
-import React from "react";
+import Chat from "@/components/chat";
 
 export default function ChatPage() {
 	return (
-		<div>
-			<h1>Chat</h1>
+		<div className="flex flex-1 flex-col items-center justify-center">
+			<Chat />
 		</div>
 	);
 }

@@ -1,5 +1,5 @@
 "use client";
-import { Calendar, Home, Inbox, Plus, Search, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -19,35 +19,6 @@ import {
 import { useChats } from "@/hooks/use-chats";
 import { ChatSearchBar } from "./chat-search-bar";
 import { ModeToggle } from "./mode-toggle";
-
-// Menu items.
-const items = [
-	{
-		title: "Home",
-		url: "#",
-		icon: Home,
-	},
-	{
-		title: "Inbox",
-		url: "#",
-		icon: Inbox,
-	},
-	{
-		title: "Calendar",
-		url: "#",
-		icon: Calendar,
-	},
-	{
-		title: "Search",
-		url: "#",
-		icon: Search,
-	},
-	{
-		title: "Settings",
-		url: "#",
-		icon: Settings,
-	},
-];
 
 const isActive = (urlChatId: string | null, chatId: string) => {
 	if (!urlChatId) return false;

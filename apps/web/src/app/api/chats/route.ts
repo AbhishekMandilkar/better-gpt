@@ -1,8 +1,6 @@
-import { auth } from "@better-gpt/auth";
 import db, { and, desc, eq, ilike } from "@better-gpt/db";
 import { chat } from "@better-gpt/db/schema/chat";
 
-import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {

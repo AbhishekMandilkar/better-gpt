@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ChatPageProps {
 	params: Promise<{ chatId: string }>;
 }

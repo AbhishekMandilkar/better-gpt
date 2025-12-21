@@ -1,5 +1,6 @@
 import type React from "react";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarInset } from "@/components/ui/sidebar";
 
 export default function ChatLayout({
 	children,
@@ -7,9 +8,9 @@ export default function ChatLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<div className="flex h-svh">
+		<>
 			<AppSidebar />
-			{children}
-		</div>
+			<SidebarInset>{children}</SidebarInset>
+		</>
 	);
 }

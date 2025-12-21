@@ -30,9 +30,7 @@ export default function RootLayout({
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
 			>
-				<Providers>
-					<div className="h-svh">{children}</div>
-				</Providers>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);
