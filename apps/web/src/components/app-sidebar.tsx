@@ -1,5 +1,5 @@
 "use client";
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
+import { Calendar, Home, Inbox, Plus, Search, Settings } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -68,9 +68,22 @@ export function AppSidebar() {
 				<SidebarGroup className="space-y-2">
 					<SidebarGroupLabel>Chats</SidebarGroupLabel>
 					<ChatSearchBar value={searchQuery} onValueChange={setSearchQuery} />
-					<SidebarGroupContent>
+					<SidebarGroupContent className="space-y-1">
+						<SidebarMenuButton
+							tooltip="New Chat"
+							className="min-w-8 cursor-pointer bg-primary text-primary-foreground duration-200 ease-linear hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+						>
+							<Link href="/chat" className="flex items-center gap-2">
+								<Plus />
+								<span>New Chat</span>
+							</Link>
+						</SidebarMenuButton>
 						{isPending ? (
-							<SidebarMenuSkeleton />
+							<div className="gap-1">
+								<SidebarMenuSkeleton />
+								<SidebarMenuSkeleton />
+								<SidebarMenuSkeleton />
+							</div>
 						) : (
 							<SidebarMenu className="gap-1">
 								{chats?.map((chat) => (
