@@ -1,11 +1,11 @@
 import { auth } from "@better-gpt/auth";
-import db, { desc, eq } from "@better-gpt/db";
+import db, { and, desc, eq, ilike } from "@better-gpt/db";
 import { chat } from "@better-gpt/db/schema/chat";
 
 import { headers } from "next/headers";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 	// const session = await auth.api.getSession({
 	// 	headers: await headers(),
 	// });
@@ -14,10 +14,18 @@ export async function GET() {
 	// 	return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	// }
 
+	const searchParams = request.nextUrl.searchParams;
+	const search = searchParams.get("search");
+
+	const conditions = [eq(chat.userId, "asdf1234")];
+	if (search?.trim()) {
+		conditions.push(ilike(chat.title, `%${search.trim()}%`));
+	}
+
 	const chats = await db
 		.select()
 		.from(chat)
-		.where(eq(chat.userId, "asdf1234"))
+		.where(and(...conditions))
 		.orderBy(desc(chat.createdAt));
 
 	return NextResponse.json(chats);

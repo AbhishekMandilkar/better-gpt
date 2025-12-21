@@ -1,7 +1,9 @@
 "use client";
 import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
 import Link from "next/link";
-
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
 import {
 	Sidebar,
 	SidebarContent,
@@ -15,6 +17,7 @@ import {
 	SidebarMenuSkeleton,
 } from "@/components/ui/sidebar";
 import { useChats } from "@/hooks/use-chats";
+import { ChatSearchBar } from "./chat-search-bar";
 import { ModeToggle } from "./mode-toggle";
 
 // Menu items.
@@ -46,22 +49,36 @@ const items = [
 	},
 ];
 
+const isActive = (urlChatId: string | null, chatId: string) => {
+	if (!urlChatId) return false;
+	return urlChatId === chatId;
+};
+
 export function AppSidebar() {
-	const { data: chats, isPending } = useChats();
-	console.log(chats, isPending);
+	const params = useParams();
+	const chatId = params.chatId as string | undefined;
+	const [searchQuery, setSearchQuery] = useState("");
+	const [debouncedSearch] = useDebounceValue(searchQuery, 300);
+
+	const { data: chats, isPending } = useChats(debouncedSearch);
+
 	return (
 		<Sidebar>
 			<SidebarContent>
-				<SidebarGroup>
+				<SidebarGroup className="space-y-2">
 					<SidebarGroupLabel>Chats</SidebarGroupLabel>
+					<ChatSearchBar value={searchQuery} onValueChange={setSearchQuery} />
 					<SidebarGroupContent>
 						{isPending ? (
 							<SidebarMenuSkeleton />
 						) : (
-							<SidebarMenu>
+							<SidebarMenu className="gap-1">
 								{chats?.map((chat) => (
 									<SidebarMenuItem key={chat.id}>
-										<SidebarMenuButton asChild={false}>
+										<SidebarMenuButton
+											asChild={false}
+											isActive={isActive(chatId ?? null, chat.id)}
+										>
 											<Link
 												href={`/chat/${chat.id}`}
 												className="flex items-center gap-2"
