@@ -377,6 +377,7 @@ interface PromptInputBoxProps {
 	isLoading?: boolean;
 	placeholder?: string;
 	className?: string;
+	demo?: boolean;
 }
 export const PromptInputBox = React.forwardRef(
 	(props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
@@ -385,6 +386,7 @@ export const PromptInputBox = React.forwardRef(
 			isLoading = false,
 			placeholder = "Type your message here...",
 			className,
+			demo = false,
 		} = props;
 		const [input, setInput] = React.useState("");
 		const [files, setFiles] = React.useState<File[]>([]);
@@ -509,6 +511,15 @@ export const PromptInputBox = React.forwardRef(
 		};
 
 		const hasContent = input.trim() !== "" || files.length > 0;
+
+		// if demo is true, we want to toggle the github and stackoverflow search on/off on regular interval
+		React.useEffect(() => {
+			if (!demo) return;
+			const interval = setInterval(() => {
+				handleToggleChange(Math.random() < 0.5 ? "github" : "stackoverflow");
+			}, 1000);
+			return () => clearInterval(interval);
+		}, [demo]);
 
 		return (
 			<>

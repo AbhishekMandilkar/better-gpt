@@ -15,6 +15,13 @@
 			"when": 1766412118192,
 			"tag": "0001_pink_beast",
 			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1766415821845,
+			"tag": "0002_cuddly_firelord",
+			"breakpoints": true
 		}
 	]
 }
