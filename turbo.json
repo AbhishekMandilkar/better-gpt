@@ -1,18 +1,12 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"ui": "tui",
+	"globalDependencies": ["./apps/web/.env*"],
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["$TURBO_DEFAULT$", ".env*"],
-			"outputs": ["dist/**", ".next/**"],
-			"env": [
-				"DATABASE_URL",
-				"BETTER_AUTH_SECRET",
-				"BETTER_AUTH_URL",
-				"POLAR_SUCCESS_URL",
-				"CORS_ORIGIN"
-			]
+			"inputs": ["$TURBO_DEFAULT$", "./apps/web/.env*"],
+			"outputs": ["dist/**", ".next/**"]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]

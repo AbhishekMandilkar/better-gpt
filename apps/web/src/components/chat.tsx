@@ -1,5 +1,4 @@
 "use client";
-import { useSearchParams } from "next/navigation";
 import type React from "react";
 import { PromptInputBox } from "@/components/chat/prompt-input-box";
 import { ChatHeader } from "./chat-header";
@@ -9,7 +8,6 @@ interface ChatProps {
 }
 
 const Chat: React.FC<ChatProps> = ({ chatId }) => {
-	const activeChatId = useSearchParams().get("chatId");
 	const handleSendMessage = (message: string, files?: File[]) => {
 		window.history.pushState({}, "", `/chat/${chatId}`);
 		// make llm call here
