@@ -63,7 +63,7 @@ export const WaitlistForm = ({ initialCount }: WaitlistFormProps) => {
 			</form>
 			{waitlistCount !== undefined && waitlistCount > 0 && (
 				<p className="ml-2 text-muted-foreground text-sm">
-					{waitlistCount}+ people on the waitlist
+					{waitlistCount} people are already on the waitlist
 				</p>
 			)}
 		</div>
