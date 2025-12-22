@@ -129,16 +129,13 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 				</span>
 			</div>
 			<div className="flex h-10 w-full items-center justify-center gap-0.5 px-4">
-				{Array.from({ length: visualizerBars }, (_, i) => ({
-					id: `bar-${i}`,
-					delay: i * 0.05,
-				})).map((bar) => (
+				{[...Array(visualizerBars)].map((_, i) => (
 					<div
-						key={bar.id}
+						key={"bar"}
 						className="w-0.5 animate-pulse rounded-full bg-white/50"
 						style={{
 							height: `${Math.max(15, Math.random() * 100)}%`,
-							animationDelay: `${bar.delay}s`,
+							animationDelay: `${i * 0.05}s`,
 							animationDuration: `${0.5 + Math.random() * 0.5}s`,
 						}}
 					/>
@@ -172,7 +169,7 @@ const ImageViewDialog: React.FC<ImageViewDialogProps> = ({
 					transition={{ duration: 0.2, ease: "easeOut" }}
 					className="relative overflow-hidden rounded-2xl bg-[#1F2023] shadow-2xl"
 				>
-					{/* biome-ignore lint/performance/noImgElement: Dynamic base64 image from FileReader */}
+					{/* biome-ignore lint/performance/noImgElement: blob URLs cannot be optimized by next/image */}
 					<img
 						src={imageUrl}
 						alt="Full preview"
@@ -255,7 +252,7 @@ const PromptInput = React.forwardRef<HTMLDivElement, PromptInputProps>(
 						disabled,
 					}}
 				>
-					{/* biome-ignore lint/a11y/noStaticElementInteractions: Drop zone for file uploads */}
+					{/* biome-ignore lint/a11y/noStaticElementInteractions: drag-drop doesn't require keyboard alternatives */}
 					<div
 						ref={ref}
 						className={cn(
@@ -292,6 +289,7 @@ const PromptInputTextarea: React.FC<
 	const { value, setValue, maxHeight, onSubmit, disabled } = usePromptInput();
 	const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: value is needed to trigger height recalculation when content changes
 	React.useEffect(() => {
 		if (disableAutosize || !textareaRef.current) return;
 		textareaRef.current.style.height = "auto";
@@ -299,7 +297,7 @@ const PromptInputTextarea: React.FC<
 			typeof maxHeight === "number"
 				? `${Math.min(textareaRef.current.scrollHeight, maxHeight)}px`
 				: `min(${textareaRef.current.scrollHeight}px, ${maxHeight})`;
-	}, [maxHeight, disableAutosize]);
+	}, [value, maxHeight, disableAutosize]);
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
 		if (e.key === "Enter" && !e.shiftKey) {
@@ -536,28 +534,35 @@ export const PromptInputBox = React.forwardRef(
 								<div key={file.name} className="group relative">
 									{file.type.startsWith("image/") &&
 										filePreviews[file.name] && (
-											<button
-												type="button"
+											// biome-ignore lint/a11y/useSemanticElements: can't use button here due to nested button for remove action
+											<div
 												className="h-16 w-16 cursor-pointer overflow-hidden rounded-xl transition-all duration-300"
 												onClick={() => openImageModal(filePreviews[file.name])}
+												onKeyDown={(e) => {
+													if (e.key === "Enter" || e.key === " ") {
+														openImageModal(filePreviews[file.name]);
+													}
+												}}
+												role="button"
+												tabIndex={0}
 											>
-												{/* biome-ignore lint/performance/noImgElement: Dynamic base64 image from FileReader */}
+												{/* biome-ignore lint/performance/noImgElement: blob URLs cannot be optimized by next/image */}
 												<img
 													src={filePreviews[file.name]}
 													alt={file.name}
 													className="h-full w-full object-cover"
 												/>
 												<button
-													type="button"
 													onClick={(e) => {
 														e.stopPropagation();
 														handleRemoveFile(index);
 													}}
+													type="button"
 													className="absolute top-1 right-1 rounded-full bg-black/70 p-0.5 opacity-100 transition-opacity"
 												>
 													<X className="h-3 w-3 text-white" />
 												</button>
-											</button>
+											</div>
 										)}
 								</div>
 							))}
@@ -603,10 +608,10 @@ export const PromptInputBox = React.forwardRef(
 						>
 							<PromptInputAction tooltip="Upload image">
 								<button
-									type="button"
 									onClick={() => uploadInputRef.current?.click()}
 									className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-[#9CA3AF] transition-colors hover:bg-gray-600/30 hover:text-[#D1D5DB]"
 									disabled={isRecording}
+									type="button"
 								>
 									<Paperclip className="h-5 w-5 transition-colors" />
 									<input
