@@ -1,13 +1,30 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
-const API_KEY = process.env.OPENROUTER_API_KEY!;
+function getOpenRouterProvider() {
+	const apiKey = process.env.OPENROUTER_API_KEY;
 
-if (!API_KEY) {
-	throw new Error("OPENROUTER_API_KEY is not set");
+	if (!apiKey) {
+		throw new Error(
+			"OPENROUTER_API_KEY is not set. Please add it to your .env.local file.",
+		);
+	}
+
+	return createOpenRouter({
+		apiKey,
+	});
 }
 
-const openRouterProvider = createOpenRouter({
-	apiKey: API_KEY,
-});
+// Lazy initialization to avoid throwing during module load
+let _provider: ReturnType<typeof createOpenRouter> | null = null;
 
-export default openRouterProvider;
+export function getProvider() {
+	if (!_provider) {
+		_provider = getOpenRouterProvider();
+	}
+	return _provider;
+}
+
+// For backward compatibility, export a function that returns the model
+export default function openRouterProvider(modelId: string) {
+	return getProvider()(modelId);
+}

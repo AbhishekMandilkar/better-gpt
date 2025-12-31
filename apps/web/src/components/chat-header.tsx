@@ -3,6 +3,7 @@
 import { MoreVertical, PlusIcon, ShareIcon } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type React from "react";
 import { memo } from "react";
 import { useWindowSize } from "usehooks-ts";
 import { Button } from "@/components/ui/button";
@@ -12,9 +13,11 @@ import { useSidebar } from "./ui/sidebar";
 function PureChatHeader({
 	chatId,
 	isReadonly,
+	children,
 }: {
 	chatId: string;
 	isReadonly: boolean;
+	children?: React.ReactNode;
 }) {
 	const router = useRouter();
 	const { open } = useSidebar();
@@ -39,6 +42,7 @@ function PureChatHeader({
 				</Button>
 			)}
 
+			{children}
 			<div className="flex-1" />
 			<Button variant="ghost" size="icon">
 				<ShareIcon size={16} />

@@ -46,6 +46,11 @@ export const joinWaitlist = async (
 };
 
 export const getWaitlistCount = async (): Promise<number> => {
-	const result = await db.select({ count: count() }).from(waitlist);
-	return result[0]?.count ?? 0;
+	try {
+		const result = await db.select({ count: count() }).from(waitlist);
+		return result[0]?.count ?? 0;
+	} catch (error) {
+		console.error("Failed to fetch waitlist count:", error);
+		return 0;
+	}
 };
