@@ -519,7 +519,7 @@ export const PromptInputBox = React.forwardRef(
 				handleToggleChange(Math.random() < 0.5 ? "github" : "stackoverflow");
 			}, 1000);
 			return () => clearInterval(interval);
-		}, [demo]);
+		}, [demo, handleToggleChange]);
 
 		return (
 			<>

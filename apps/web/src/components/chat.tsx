@@ -14,6 +14,7 @@ import {
 	ModelSelector,
 } from "@/components/chat/model-selector";
 import { PromptInputBox } from "@/components/chat/prompt-input-box";
+import { Response } from "@/components/chat/response";
 import { ThinkingMessage } from "@/components/chat/thinking-message";
 import { useMessages } from "@/hooks/use-messages";
 import { cn } from "@/lib/utils";
@@ -45,7 +46,6 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 					id: chatId,
 				},
 				prepareSendMessagesRequest(request) {
-					const lastMessage = request.messages.at(-1);
 					return {
 						body: {
 							id: chatId,
@@ -59,13 +59,12 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 		[chatId],
 	);
 
-	const { messages, setMessages, sendMessage, regenerate, status, error } =
-		useChat({
-			id: chatId,
-			transport,
-			messages: initialMessages,
-			experimental_throttle: 100,
-		});
+	const { messages, sendMessage, regenerate, status, error } = useChat({
+		id: chatId,
+		transport,
+		messages: initialMessages,
+		experimental_throttle: 100,
+	});
 
 	// Scroll management
 	const { containerRef, endRef, isAtBottom, scrollToBottom, hasSentMessage } =
@@ -95,7 +94,7 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 		}
 	}, [query, sendMessage, hasAppendedQuery, chatId, messages.length]);
 
-	const handleSendMessage = (message: string, files?: File[]) => {
+	const handleSendMessage = (message: string, _files?: File[]) => {
 		if (!message.trim()) return;
 
 		// Update URL to include chatId
@@ -238,7 +237,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 					{/* Text content */}
 					{textParts.map((part, i) => (
 						<div
-							key={part.text}
+							// biome-ignore lint/suspicious/noArrayIndexKey: Index is stable for text parts
+							key={i}
 							className={cn(
 								"rounded-2xl px-4 py-3",
 								isUser
@@ -246,7 +246,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 									: "bg-transparent px-0 py-0",
 							)}
 						>
-							<div className="whitespace-pre-wrap">{part.text}</div>
+							<Response>{part.text}</Response>
 						</div>
 					))}
 
