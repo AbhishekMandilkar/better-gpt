@@ -1,7 +1,6 @@
 "use client";
 
 import { MoreVertical, PlusIcon, ShareIcon } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type React from "react";
 import { memo } from "react";

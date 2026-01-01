@@ -2,7 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { ArrowDown, Sparkles } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -19,6 +19,7 @@ import { ThinkingMessage } from "@/components/chat/thinking-message";
 import { useMessages } from "@/hooks/use-messages";
 import { cn } from "@/lib/utils";
 import { ChatHeader } from "./chat-header";
+import { BotMessageSquareIcon } from "./ui/bot-message-square";
 
 interface ChatProps {
 	chatId: string;
@@ -213,8 +214,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 				)}
 			>
 				{!isUser && (
-					<div className="-mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-background ring-1 ring-border">
-						<Sparkles className="size-4" />
+					<div className="-mt-1 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted ring ring-foreground/10">
+						<BotMessageSquareIcon className="size-6" />
 					</div>
 				)}
 
@@ -240,9 +241,9 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 							// biome-ignore lint/suspicious/noArrayIndexKey: Index is stable for text parts
 							key={i}
 							className={cn(
-								"rounded-2xl px-4 py-3",
+								"rounded-md px-4 py-2",
 								isUser
-									? "bg-primary text-primary-foreground"
+									? "bg-primary-foreground text-primary"
 									: "bg-transparent px-0 py-0",
 							)}
 						>

@@ -1,4 +1,4 @@
-import db, { asc, desc, eq } from "@better-gpt/db";
+import db, { asc, eq } from "@better-gpt/db";
 import {
 	type Chat,
 	chat,

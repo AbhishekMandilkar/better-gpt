@@ -79,7 +79,7 @@ export async function POST(request: Request) {
 		const lastUserMessage = uiMessages.findLast((m) => m.role === "user");
 
 		// Check if chat exists (for authenticated users)
-		let shouldGenerateTitle = false;
+		let _shouldGenerateTitle = false;
 		let titlePromise: Promise<string> | null = null;
 
 		if (isAuthenticated && userId) {
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
 					title: "New chat",
 					visibility: "private",
 				});
-				shouldGenerateTitle = true;
+				_shouldGenerateTitle = true;
 
 				// Start title generation in parallel (don't await)
 				if (lastUserMessage) {

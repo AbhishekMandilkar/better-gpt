@@ -39,7 +39,8 @@
 		"rules": {
 			"recommended": true,
 			"correctness": {
-				"useExhaustiveDependencies": "info"
+				"useExhaustiveDependencies": "info",
+				"noInvalidPositionAtImportRule": "off"
 			},
 			"nursery": {
 				"useSortedClasses": {

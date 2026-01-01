@@ -1,6 +1,10 @@
+import Link from "next/link";
 import { getWaitlistCount } from "@/actions/waitlist";
 import { PromptInputBox } from "@/components/chat/prompt-input-box";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { Button } from "./ui/button";
+
+const isLocal = process.env.NODE_ENV === "development";
 
 const Hero = async () => {
 	const waitlistCount = await getWaitlistCount();
@@ -18,6 +22,11 @@ const Hero = async () => {
 						to solve your errors with proven fixes, not generic replies.
 					</p>
 					<WaitlistForm initialCount={waitlistCount} />
+					{isLocal && (
+						<Link href="/chat">
+							<Button>Go to Chat</Button>
+						</Link>
+					)}
 				</div>
 				<div className="display-flex my-auto w-full rounded-xl">
 					<PromptInputBox demo />
