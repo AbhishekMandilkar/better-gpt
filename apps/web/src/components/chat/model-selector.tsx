@@ -86,9 +86,17 @@ export const ModelSelector = ({
 }: ModelSelectorProps) => {
 	const [open, setOpen] = useState(false);
 
-	const selectedModel =
-		AVAILABLE_MODELS.find((m) => m.id === selectedModelId) ||
-		AVAILABLE_MODELS[0];
+	const [selectedModel, setSelectedModel] = useState<Model>(
+		AVAILABLE_MODELS[0],
+	);
+
+	const onSelectModel = (modelId: string) => {
+		setSelectedModel(
+			AVAILABLE_MODELS.find((model) => model.id === modelId) ||
+				AVAILABLE_MODELS[0],
+		);
+		onModelChange(modelId);
+	};
 
 	return (
 		<DropdownMenu open={open} onOpenChange={setOpen}>
@@ -116,10 +124,7 @@ export const ModelSelector = ({
 				{AVAILABLE_MODELS.map((model) => (
 					<DropdownMenuItem
 						key={model.id}
-						onSelect={() => {
-							onModelChange(model.id);
-							setOpen(false);
-						}}
+						onSelect={() => onSelectModel(model.id)}
 						className="flex items-center justify-between"
 					>
 						<div className="flex flex-col gap-0.5">
