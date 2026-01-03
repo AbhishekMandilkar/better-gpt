@@ -2,10 +2,11 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
-import { ArrowDown } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChatError } from "@/components/chat/chat-error";
 import { Greeting } from "@/components/chat/greeting";
 import { MessageActions } from "@/components/chat/message-actions";
 import { MessageReasoning } from "@/components/chat/message-reasoning";
@@ -14,9 +15,13 @@ import {
 	ModelSelector,
 } from "@/components/chat/model-selector";
 import { PromptInputBox } from "@/components/chat/prompt-input-box";
-import { Response } from "@/components/chat/response";
 import { ThinkingMessage } from "@/components/chat/thinking-message";
-import { useMessages } from "@/hooks/use-messages";
+import {
+	ChatContainerContent,
+	ChatContainerRoot,
+	ChatContainerScrollAnchor,
+} from "@/components/ui/chat-container";
+import { Message, MessageContent } from "@/components/ui/message";
 import { cn } from "@/lib/utils";
 import { ChatHeader } from "./chat-header";
 import { BotMessageSquareIcon } from "./ui/bot-message-square";
@@ -43,21 +48,17 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 		() =>
 			new DefaultChatTransport({
 				api: "/api/chat",
-				body: {
-					id: chatId,
-				},
 				prepareSendMessagesRequest(request) {
 					return {
 						body: {
 							id: chatId,
 							messages: request.messages,
 							model: currentModelIdRef.current,
-							...request.body,
 						},
 					};
 				},
 			}),
-		[chatId],
+		[chatId, currentModelIdRef],
 	);
 
 	const { messages, sendMessage, regenerate, status, error } = useChat({
@@ -66,10 +67,7 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 		messages: initialMessages,
 		experimental_throttle: 100,
 	});
-
-	// Scroll management
-	const { containerRef, endRef, isAtBottom, scrollToBottom, hasSentMessage } =
-		useMessages({ status });
+	console.log(error);
 
 	const isLoading = status === "streaming" || status === "submitted";
 
@@ -119,57 +117,29 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 			</ChatHeader>
 
 			{/* Messages area with scroll management */}
-			<div className="relative flex-1">
-				<div
-					className="absolute inset-0 touch-pan-y overflow-y-auto"
-					ref={containerRef}
-				>
-					<div className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
-						{messages.length === 0 && <Greeting />}
+			<ChatContainerRoot className="relative flex-1">
+				<ChatContainerContent className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
+					{messages.length === 0 && <Greeting />}
 
-						{messages.map((message, index) => (
-							<MessageBubble
-								key={message.id}
-								message={message}
-								isLoading={
-									status === "streaming" && messages.length - 1 === index
-								}
-								onRegenerate={
-									message.role === "assistant" ? handleRegenerate : undefined
-								}
-								requiresScrollPadding={
-									hasSentMessage && index === messages.length - 1
-								}
-							/>
-						))}
+					{messages.map((message, index) => (
+						<MessageBubble
+							key={message.id}
+							message={message}
+							isLoading={
+								status === "streaming" && messages.length - 1 === index
+							}
+							onRegenerate={
+								message.role === "assistant" ? handleRegenerate : undefined
+							}
+						/>
+					))}
 
-						{status === "submitted" && <ThinkingMessage />}
+					{status === "submitted" && <ThinkingMessage />}
 
-						{error && (
-							<div className="rounded-lg bg-destructive/10 p-4 text-destructive">
-								<p>Error: {error.message}</p>
-							</div>
-						)}
-
-						<div className="min-h-[24px] min-w-[24px] shrink-0" ref={endRef} />
-					</div>
-				</div>
-
-				{/* Scroll to bottom button */}
-				<button
-					aria-label="Scroll to bottom"
-					className={cn(
-						"absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full border bg-background p-2 shadow-lg transition-all hover:bg-muted",
-						isAtBottom
-							? "pointer-events-none scale-0 opacity-0"
-							: "pointer-events-auto scale-100 opacity-100",
-					)}
-					onClick={() => scrollToBottom("smooth")}
-					type="button"
-				>
-					<ArrowDown className="size-4" />
-				</button>
-			</div>
+					{error && <ChatError error={error} />}
+					<ChatContainerScrollAnchor />
+				</ChatContainerContent>
+			</ChatContainerRoot>
 
 			<div className="sticky bottom-0 z-1 mx-auto flex w-full max-w-4xl gap-2 border-t-0 bg-background px-2 pb-3 md:px-4 md:pb-4">
 				<PromptInputBox onSend={handleSendMessage} isLoading={isLoading} />
@@ -182,14 +152,12 @@ interface MessageBubbleProps {
 	message: UIMessage;
 	isLoading: boolean;
 	onRegenerate?: () => void;
-	requiresScrollPadding?: boolean;
 }
 
 const MessageBubble: React.FC<MessageBubbleProps> = ({
 	message,
 	isLoading,
 	onRegenerate,
-	requiresScrollPadding,
 }) => {
 	const isUser = message.role === "user";
 
@@ -201,15 +169,12 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
 	return (
 		<div
-			className={cn(
-				"group/message fade-in w-full animate-in duration-200",
-				requiresScrollPadding && "scroll-mt-24",
-			)}
+			className="group/message fade-in w-full animate-in duration-200"
 			data-role={message.role}
 		>
-			<div
+			<Message
 				className={cn(
-					"flex w-full items-start gap-2 md:gap-3",
+					"w-full items-start gap-2 md:gap-3",
 					isUser ? "justify-end" : "justify-start",
 				)}
 			>
@@ -237,18 +202,19 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 
 					{/* Text content */}
 					{textParts.map((part, i) => (
-						<div
+						<MessageContent
 							// biome-ignore lint/suspicious/noArrayIndexKey: Index is stable for text parts
 							key={i}
+							markdown
 							className={cn(
-								"rounded-md px-4 py-2",
+								"px-4 py-2",
 								isUser
 									? "bg-primary-foreground text-primary"
 									: "bg-transparent px-0 py-0",
 							)}
 						>
-							<Response>{part.text}</Response>
-						</div>
+							{part.text}
+						</MessageContent>
 					))}
 
 					{/* Message actions */}
@@ -258,7 +224,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({
 						onRegenerate={onRegenerate}
 					/>
 				</div>
-			</div>
+			</Message>
 		</div>
 	);
 };

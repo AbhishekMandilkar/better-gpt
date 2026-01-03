@@ -62,10 +62,11 @@ export async function POST(request: Request) {
 			if (!rateLimit.allowed) {
 				return new Response(
 					JSON.stringify({
-						error: "Rate limit exceeded",
+						error: "Daily limit reached",
 						message:
-							"You have reached your daily limit. Please sign in for unlimited access.",
+							"You’ve used all free requests for today. Sign in to continue without limits.",
 						resetAt: rateLimit.resetAt,
+						action: "sign-in",
 					}),
 					{
 						status: 429,
@@ -135,7 +136,6 @@ export async function POST(request: Request) {
 			model.includes("o1") ||
 			model.includes("o3") ||
 			model.includes("deepseek-r1");
-
 		// Create the UI message stream
 		const stream = createUIMessageStream({
 			execute: async ({ writer: dataStream }) => {

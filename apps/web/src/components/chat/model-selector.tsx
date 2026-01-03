@@ -21,17 +21,6 @@ export interface Model {
 
 export const AVAILABLE_MODELS: Model[] = [
 	{
-		id: "xiaomi/mimo-v2-flash:free",
-		name: "Mimo v2 Flash",
-		description: "Fast and free",
-		isFree: true,
-	},
-	{
-		id: "openai/gpt-4o-mini",
-		name: "GPT-4o Mini",
-		description: "Fast and capable",
-	},
-	{
 		id: "openai/gpt-4o",
 		name: "GPT-4o",
 		description: "Most capable",
@@ -42,15 +31,45 @@ export const AVAILABLE_MODELS: Model[] = [
 		description: "Excellent for coding",
 	},
 	{
-		id: "anthropic/claude-3.5-haiku",
-		name: "Claude 3.5 Haiku",
-		description: "Fast and affordable",
+		id: "deepseek/deepseek-chat",
+		name: "DeepSeek V3",
+		description: "Strong open model",
+	},
+	{
+		id: "google/gemini-pro-1.5",
+		name: "Gemini 1.5 Pro",
+		description: "Large context window",
+	},
+	{
+		id: "meta-llama/llama-3.3-70b-instruct",
+		name: "Llama 3.3 70B",
+		description: "Leading open source",
 	},
 	{
 		id: "deepseek/deepseek-r1",
 		name: "DeepSeek R1",
 		description: "Reasoning model",
 		isReasoning: true,
+	},
+	{
+		id: "qwen/qwen-2.5-72b-instruct",
+		name: "Qwen 2.5 72B",
+		description: "Strong performance",
+	},
+	{
+		id: "anthropic/claude-3.5-haiku",
+		name: "Claude 3.5 Haiku",
+		description: "Fast and affordable",
+	},
+	{
+		id: "openai/gpt-4o-mini",
+		name: "GPT-4o Mini",
+		description: "Fast and capable",
+	},
+	{
+		id: "mistralai/mistral-large-2411",
+		name: "Mistral Large 2",
+		description: "Strong performance",
 	},
 ];
 
@@ -79,20 +98,25 @@ export const ModelSelector = ({
 					size="sm"
 					className={cn("gap-1 text-muted-foreground", className)}
 				>
-					{selectedModel.isReasoning ? (
+					{selectedModel?.isReasoning ? (
 						<Sparkles className="size-3.5" />
 					) : (
 						<Zap className="size-3.5" />
 					)}
-					<span className="max-w-[120px] truncate">{selectedModel.name}</span>
+					<span className="max-w-[120px] truncate">
+						{selectedModel?.name || "Select Model"}
+					</span>
 					<ChevronDown className="size-3.5" />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" className="w-64">
+			<DropdownMenuContent
+				align="start"
+				className="max-h-[300px] w-64 overflow-y-auto"
+			>
 				{AVAILABLE_MODELS.map((model) => (
 					<DropdownMenuItem
 						key={model.id}
-						onClick={() => {
+						onSelect={() => {
 							onModelChange(model.id);
 							setOpen(false);
 						}}
