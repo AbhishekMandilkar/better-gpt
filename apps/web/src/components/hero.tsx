@@ -29,7 +29,7 @@ const Hero = async () => {
 					)}
 				</div>
 				<div className="display-flex my-auto w-full rounded-xl">
-					<PromptInputBox demo />
+					<PromptInputBox />
 				</div>
 			</div>
 		</div>
