@@ -5,6 +5,7 @@ import {
 	ReasoningContent,
 	ReasoningTrigger,
 } from "@/components/ui/reasoning";
+import { TextShimmer } from "../ui/text-shimmer";
 
 interface MessageReasoningProps {
 	reasoning: string;
@@ -19,13 +20,16 @@ export const MessageReasoning = ({
 
 	return (
 		<Reasoning isStreaming={isLoading}>
-			<ReasoningTrigger className="text-sm italic">
-				{isLoading ? "Thinking..." : "View reasoning"}
+			<ReasoningTrigger className="text-sm">
+				{isLoading ? (
+					<TextShimmer duration={2} spread={10}>
+						Thinking...
+					</TextShimmer>
+				) : (
+					"View reasoning"
+				)}
 			</ReasoningTrigger>
-			<ReasoningContent
-				markdown
-				className="ml-2 border-l-2 border-l-foreground-muted px-2 pb-1 font-mono text-xs italic"
-			>
+			<ReasoningContent markdown className="p-2 font-mono text-xs italic">
 				{reasoning}
 			</ReasoningContent>
 		</Reasoning>
