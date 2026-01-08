@@ -31,5 +31,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 	const messagesFromDb = await getMessagesByChatId({ id: chatId });
 	const initialMessages = convertToUIMessages(messagesFromDb);
 
-	return <Chat chatId={chatId} initialMessages={initialMessages} />;
+	return (
+		<Chat key={chatId} chatId={chatId} initialMessages={initialMessages} />
+	);
 }

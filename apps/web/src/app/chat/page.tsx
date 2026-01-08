@@ -7,7 +7,7 @@ export default function ChatPage() {
 	const newChatId = randomUUID();
 	return (
 		<Suspense fallback={<Loader />}>
-			<Chat chatId={newChatId} />
+			<Chat key={newChatId} chatId={newChatId} />
 		</Suspense>
 	);
 }

@@ -40,15 +40,15 @@ export function AppSidebar() {
 					<SidebarGroupLabel>Chats</SidebarGroupLabel>
 					<ChatSearchBar value={searchQuery} onValueChange={setSearchQuery} />
 					<SidebarGroupContent className="space-y-1">
-						<SidebarMenuButton
-							tooltip="New Chat"
-							className="min-w-8 cursor-pointer"
-						>
-							<Link href="/chat" className="flex items-center gap-2">
+						<Link href="/chat" className="flex items-center gap-2">
+							<SidebarMenuButton
+								tooltip="New Chat"
+								className="min-w-8 cursor-pointer"
+							>
 								<Plus />
 								<span>New Chat</span>
-							</Link>
-						</SidebarMenuButton>
+							</SidebarMenuButton>
+						</Link>
 						{isPending ? (
 							<div className="gap-1">
 								<SidebarMenuSkeleton />
@@ -59,17 +59,17 @@ export function AppSidebar() {
 							<SidebarMenu className="gap-1">
 								{chats?.map((chat) => (
 									<SidebarMenuItem key={chat.id}>
-										<SidebarMenuButton
-											asChild={false}
-											isActive={isActive(chatId ?? null, chat.id)}
+										<Link
+											href={`/chat/${chat.id}`}
+											className="flex items-center gap-2"
 										>
-											<Link
-												href={`/chat/${chat.id}`}
-												className="flex items-center gap-2"
+											<SidebarMenuButton
+												asChild={false}
+												isActive={isActive(chatId ?? null, chat.id)}
 											>
 												<span>{chat.title}</span>
-											</Link>
-										</SidebarMenuButton>
+											</SidebarMenuButton>
+										</Link>
 									</SidebarMenuItem>
 								))}
 							</SidebarMenu>
