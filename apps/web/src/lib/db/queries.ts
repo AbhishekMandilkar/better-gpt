@@ -53,7 +53,7 @@ export async function saveMessages({
 	}>;
 }): Promise<DBMessage[]> {
 	if (messages.length === 0) return [];
-
+	console.log("saving messages", messages);
 	const result = await db.insert(message).values(messages).returning();
 	return result;
 }
