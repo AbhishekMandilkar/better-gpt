@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Chat from "@/components/chat";
 import { getChatById, getMessagesByChatId } from "@/lib/db/queries";
-import { getGuestId } from "@/lib/guest";
 import { convertToUIMessages } from "@/lib/utils";
 
 interface ChatPageProps {
@@ -22,7 +21,7 @@ export default async function ChatPage({ params }: ChatPageProps) {
 		headers: await headers(),
 	});
 
-	const userId = session?.user?.id || (await getGuestId());
+	const userId = session?.user?.id;
 
 	if (chat.visibility === "private" && chat.userId !== userId) {
 		notFound();

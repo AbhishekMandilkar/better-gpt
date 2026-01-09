@@ -2,6 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
+import { Info } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
@@ -16,12 +17,14 @@ import {
 } from "@/components/chat/model-selector";
 import { PromptInputBox } from "@/components/chat/prompt-input-box";
 import { ThinkingMessage } from "@/components/chat/thinking-message";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
 	ChatContainerContent,
 	ChatContainerRoot,
 	ChatContainerScrollAnchor,
 } from "@/components/ui/chat-container";
 import { Message, MessageContent } from "@/components/ui/message";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { ChatHeader } from "./chat-header";
 import { BotMessageSquareIcon } from "./ui/bot-message-square";
@@ -34,6 +37,7 @@ interface ChatProps {
 const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const { data: session } = authClient.useSession();
 
 	// Model selection state
 	const [currentModelId, setCurrentModelId] = useState(AVAILABLE_MODELS[0].id);
@@ -119,6 +123,16 @@ const Chat: React.FC<ChatProps> = ({ chatId, initialMessages = [] }) => {
 			{/* Messages area with scroll management */}
 			<ChatContainerRoot className="relative flex-1">
 				<ChatContainerContent className="mx-auto flex min-w-0 max-w-4xl flex-col gap-4 px-2 py-4 md:gap-6 md:px-4">
+					{!session && messages.length > 0 && (
+						<Alert variant="default" className="border-none bg-muted/50">
+							<Info className="h-4 w-4" />
+							<AlertTitle>Guest Mode</AlertTitle>
+							<AlertDescription>
+								Your messages are not saved. Please sign in to save your chat
+								history.
+							</AlertDescription>
+						</Alert>
+					)}
 					{messages.length === 0 && <Greeting />}
 
 					{messages.map((message, index) => (

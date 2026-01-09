@@ -16,7 +16,6 @@ import {
 	saveMessages,
 	updateChatTitleById,
 } from "@/lib/db/queries";
-import { createGuestUser, GUEST_COOKIE_NAME, getGuestId } from "@/lib/guest";
 import openRouterProvider from "@/lib/openrouter";
 import { checkRateLimit, getClientIp } from "@/lib/ratelimit";
 import { convertToUIMessages } from "@/lib/utils";
@@ -55,17 +54,7 @@ export async function POST(request: Request) {
 		});
 
 		const isAuthenticated = !!session?.user;
-		let userId = session?.user?.id;
-		let newGuestId: string | undefined;
-
-		// Handle guest users
-		if (!userId) {
-			userId = await getGuestId();
-			if (!userId) {
-				userId = await createGuestUser();
-				newGuestId = userId;
-			}
-		}
+		const userId = session?.user?.id;
 
 		// Rate limit unauthenticated users (real users who are not logged in)
 		if (!isAuthenticated) {
@@ -114,8 +103,8 @@ export async function POST(request: Request) {
 				// Fetch existing messages
 				const dbMessages = await getMessagesByChatId({ id: chatId });
 				messagesFromDb = convertToUIMessages(dbMessages);
-			} else {
-				// Create new chat
+			} else if (isAuthenticated) {
+				// Create new chat ONLY for authenticated users
 				await saveChat({
 					id: chatId,
 					userId,
@@ -132,11 +121,8 @@ export async function POST(request: Request) {
 				}
 			}
 
-			// Save the user message
-			if (lastUserMessage) {
-				// The AI SDK generates "temporary" IDs for messages (e.g. random strings like 'ewYEAtYLXrHWvslY')
-				// But our DB schema enforces standard UUIDs.
-				// We must generate a real UUID if the incoming ID is not one.
+			// Save the user message ONLY for authenticated users
+			if (isAuthenticated && lastUserMessage) {
 				const messageId = isValidUUID(lastUserMessage.id)
 					? lastUserMessage.id
 					: generateUUID();
@@ -205,8 +191,8 @@ export async function POST(request: Request) {
 			},
 			generateId: generateUUID,
 			onFinish: async ({ messages: finishedMessages }) => {
-				// Save assistant messages for authenticated users and guests
-				if (userId && finishedMessages.length > 0) {
+				// Save assistant messages ONLY for authenticated users
+				if (isAuthenticated && userId && finishedMessages.length > 0) {
 					await saveMessages({
 						messages: finishedMessages.map((msg) => ({
 							id: isValidUUID(msg.id) ? msg.id : generateUUID(),
@@ -224,19 +210,8 @@ export async function POST(request: Request) {
 			},
 		});
 
-		const responseHeaders = new Headers({
-			"Content-Type": "application/json",
-		});
-
-		if (newGuestId) {
-			responseHeaders.append(
-				"Set-Cookie",
-				`${GUEST_COOKIE_NAME}=${newGuestId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000`,
-			);
-		}
-
 		return new Response(stream.pipeThrough(new JsonToSseTransformStream()), {
-			headers: responseHeaders,
+			headers: { "Content-Type": "application/json" },
 		});
 	} catch (error) {
 		console.error("Chat API error:", error);

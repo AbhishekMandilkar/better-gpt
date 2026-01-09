@@ -3,14 +3,14 @@ import db, { and, desc, eq, ilike } from "@better-gpt/db";
 import { chat } from "@better-gpt/db/schema/chat";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
-import { getGuestId } from "@/lib/guest";
 
 export async function GET(request: NextRequest) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
 
-	const userId = session?.user?.id || (await getGuestId());
+	// Only fetch chats for authenticated users
+	const userId = session?.user?.id;
 
 	if (!userId) {
 		return NextResponse.json([]);
